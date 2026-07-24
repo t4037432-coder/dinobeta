@@ -312,7 +312,6 @@
                 });
             }
 
-            // AI Logic nâng cấp cho điểm >= 7000
             function handleAI() {
                 if (!isAFK || isGameOver || !isGameStarted) return;
 
@@ -323,7 +322,7 @@
 
                     let decisionDistance = 180 + gameSpeed * 5;
                     if (score >= 7000) {
-                        decisionDistance += 120; // Phát hiện từ xa hơn khi đạt 7000 điểm
+                        decisionDistance += 120;
                     }
 
                     if (!targetObs.aiDecided && distance < decisionDistance) {
@@ -338,7 +337,6 @@
                     if (targetObs.aiDecided && targetObs.shouldSucceed) {
                         let jumpDistance = 65 + gameSpeed * 1.5;
                         
-                        // Nhảy xa và sớm hơn từ 7000 điểm trở đi
                         if (score >= 7000) {
                             jumpDistance = 95 + gameSpeed * 2.3; 
                         }
