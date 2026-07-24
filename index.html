@@ -406,7 +406,8 @@
 
                 handleAI();
 
-                if (Math.floor(score) > 0 && Math.floor(score / 500) % 2 === 1) {
+                // Đổi ngày/đêm mỗi 1000 điểm
+                if (Math.floor(score) > 0 && Math.floor(score / 1000) % 2 === 1) {
                     canvas.classList.add("night");
                 } else {
                     canvas.classList.remove("night");
