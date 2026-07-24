@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canvas Game</title>
+    <title>Chrome Dino Game</title>
     <style>
         * {
             margin: 0;
@@ -11,20 +11,35 @@
             box-sizing: border-box;
         }
         body {
-            background-color: #000;
+            /* Đổi nền sang màu trắng giống hệt hình ảnh của bạn */
+            background-color: #ffffff; 
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
             overflow: hidden;
-            width: 100vw;
-            height: 100vh;
+        }
+        h1 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: normal;
         }
         canvas {
             display: block;
-            width: 100%;
-            height: 100%;
+            background-color: #ffffff;
         }
     </style>
 </head>
 <body>
 
+    <h1>Chrome Dino Game</h1>
+    <!-- Game sẽ tự gắn vào thẻ canvas này -->
+    <canvas id="canvas"></canvas>
+
+    <!-- Nhớ dán toàn bộ mã JavaScript vào file script.js nằm cùng thư mục -->
     <script src="script.js"></script>
 </body>
 </html>
