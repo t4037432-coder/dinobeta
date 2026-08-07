@@ -2,34 +2,44 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Test 1 LOL mỗi giây</title>
+    <title>Test Nhạc và In LOL</title>
 </head>
 <body>
-    <h1 id="status">Chuẩn bị trong 5 giây...</h1>
+    <h1 id="status">Vui lòng bấm nút để bắt đầu...</h1>
+    <!-- Thay 'link_nhac_cua_ban.mp3' bằng link file nhạc thực tế của bạn -->
+    <audio id="myAudio" src="LINK_NHAC_CUA_BAN.mp3"></audio>
+    <button onclick="startSystem()">Bắt đầu hệ thống</button>
     <div id="content"></div>
 
     <script>
-        let countdown = 5;
         const statusText = document.getElementById('status');
         const contentDiv = document.getElementById('content');
+        const audio = document.getElementById('myAudio');
+        let hasStarted = false;
 
-        // Đếm ngược từ 5 về 1
-        let timer = setInterval(() => {
-            countdown--;
-            if (countdown > 0) {
-                statusText.innerText = "Đếm ngược: " + countdown;
-            } else {
-                clearInterval(timer);
-                statusText.innerText = "Bắt đầu in chữ LOL (1 lần/giây):";
-                
-                // Sau khi đếm xong, cứ đúng 1 giây (1000ms) in ra 1 chữ LOL
-                setInterval(() => {
-                    let p = document.createElement('p');
-                    p.innerText = "LOL";
-                    contentDiv.appendChild(p);
-                }, 1000); // 1000ms = 1 giây
-            }
-        }, 1000);
+        function startSystem() {
+            if (hasStarted) return;
+            hasStarted = true;
+            audio.play();
+            statusText.innerText = "Đang phát nhạc (20 giây chờ)...";
+
+            audio.addEventListener('timeupdate', () => {
+                // Kiểm tra nếu nhạc đã chạy được 20 giây
+                if (audio.currentTime >= 20) {
+                    statusText.innerText = "have fun LOL";
+                    
+                    // Xóa event listener để tránh chạy hàm này liên tục
+                    audio.removeEventListener('timeupdate', arguments.callee);
+
+                    // Thiết lập bộ đếm 100ms = 10 lần/giây
+                    setInterval(() => {
+                        let p = document.createElement('p');
+                        p.innerText = "LOL";
+                        contentDiv.appendChild(p);
+                    }, 100);
+                }
+            });
+        }
     </script>
 </body>
 </html>
