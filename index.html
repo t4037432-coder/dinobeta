@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Test 1 LOL mỗi giây</title>
+</head>
+<body>
+    <h1 id="status">Chuẩn bị trong 5 giây...</h1>
+    <div id="content"></div>
+
+    <script>
+        let countdown = 5;
+        const statusText = document.getElementById('status');
+        const contentDiv = document.getElementById('content');
+
+        // Đếm ngược từ 5 về 1
+        let timer = setInterval(() => {
+            countdown--;
+            if (countdown > 0) {
+                statusText.innerText = "Đếm ngược: " + countdown;
+            } else {
+                clearInterval(timer);
+                statusText.innerText = "Bắt đầu in chữ LOL (1 lần/giây):";
+                
+                // Sau khi đếm xong, cứ đúng 1 giây (1000ms) in ra 1 chữ LOL
+                setInterval(() => {
+                    let p = document.createElement('p');
+                    p.innerText = "LOL";
+                    contentDiv.appendChild(p);
+                }, 1000); // 1000ms = 1 giây
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
