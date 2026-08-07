@@ -2,20 +2,22 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Hardtekk LOL System</title>
+    <title>Hardtekk LOL System - Fix Click</title>
     <style>
         body { background-color: #121212; color: #ffffff; font-family: Arial, sans-serif; text-align: center; padding-top: 50px; }
-        #content { max-height: 400px; overflow-y: auto; margin: 20px auto; width: 50%; border: 1px solid #333; padding: 10px; background: #1e1e1e; }
-        button { padding: 10px 20px; font-size: 16px; background-color: #ff4757; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        #content { max-height: 400px; overflow-y: auto; margin: 20px auto; width: 50%; border: 1px solid #333; padding: 10px; background: #1e1e1e; text-align: left; }
+        button { padding: 12px 24px; font-size: 18px; background-color: #ff4757; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #ff6b81; }
     </style>
 </head>
 <body>
 
     <h1 id="status">Nhấn "Khởi động" để bắt đầu...</h1>
     
-    <!-- Dùng trực tiếp tên file video/audio của bạn -->
-    <audio id="bgMusic" src="Cool (Hardtekk Version).mp4"></audio>
+    <!-- Thêm thuộc tính playsinline và preload -->
+    <audio id="bgMusic" src="Cool (Hardtekk Version).mp4" preload="auto"></audio>
     
+    <br>
     <button onclick="startSystem()">Khởi động</button>
     <div id="content"></div>
 
@@ -30,11 +32,19 @@
             if (hasStarted) return;
             hasStarted = true;
             
-            audio.play().then(() => {
-                statusText.innerText = "Đang phát nhạc... Chờ mốc 20 giây đầu.";
-            }).catch(error => {
-                console.log("Lỗi phát:", error);
-            });
+            // Ép buộc load và phát âm thanh
+            audio.load();
+            let playPromise = audio.play();
+
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    statusText.innerText = "Đang phát nhạc... Chờ mốc 20 giây đầu.";
+                }).catch(error => {
+                    statusText.innerText = "Lỗi phát nhạc: Hãy kiểm tra lại tên file hoặc định dạng!";
+                    console.error("Lỗi chi tiết:", error);
+                    hasStarted = false; // Cho phép bấm lại nếu lỗi
+                });
+            }
 
             audio.addEventListener('timeupdate', function checkTime() {
                 if (audio.currentTime >= 20 && !isTriggered) {
