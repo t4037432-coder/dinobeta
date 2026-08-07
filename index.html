@@ -2,40 +2,51 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Test Nhạc và In LOL</title>
+    <title>Hardtekk LOL System</title>
+    <style>
+        body { background-color: #121212; color: #ffffff; font-family: Arial, sans-serif; text-align: center; padding-top: 50px; }
+        #content { max-height: 400px; overflow-y: auto; margin: 20px auto; width: 50%; border: 1px solid #333; padding: 10px; background: #1e1e1e; }
+        button { padding: 10px 20px; font-size: 16px; background-color: #ff4757; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
 </head>
 <body>
-    <h1 id="status">Vui lòng bấm nút để bắt đầu...</h1>
-    <!-- Thay 'link_nhac_cua_ban.mp3' bằng link file nhạc thực tế của bạn -->
-    <audio id="myAudio" src="LINK_NHAC_CUA_BAN.mp3"></audio>
-    <button onclick="startSystem()">Bắt đầu hệ thống</button>
+
+    <h1 id="status">Nhấn "Khởi động" để bắt đầu...</h1>
+    
+    <!-- Dùng trực tiếp tên file video/audio của bạn -->
+    <audio id="bgMusic" src="Cool (Hardtekk Version).mp4"></audio>
+    
+    <button onclick="startSystem()">Khởi động</button>
     <div id="content"></div>
 
     <script>
         const statusText = document.getElementById('status');
         const contentDiv = document.getElementById('content');
-        const audio = document.getElementById('myAudio');
+        const audio = document.getElementById('bgMusic');
         let hasStarted = false;
+        let isTriggered = false;
 
         function startSystem() {
             if (hasStarted) return;
             hasStarted = true;
-            audio.play();
-            statusText.innerText = "Đang phát nhạc (20 giây chờ)...";
+            
+            audio.play().then(() => {
+                statusText.innerText = "Đang phát nhạc... Chờ mốc 20 giây đầu.";
+            }).catch(error => {
+                console.log("Lỗi phát:", error);
+            });
 
-            audio.addEventListener('timeupdate', () => {
-                // Kiểm tra nếu nhạc đã chạy được 20 giây
-                if (audio.currentTime >= 20) {
-                    statusText.innerText = "have fun LOL";
+            audio.addEventListener('timeupdate', function checkTime() {
+                if (audio.currentTime >= 20 && !isTriggered) {
+                    isTriggered = true;
+                    statusText.innerText = "Đã qua 20 giây: In 10 LOL/s!";
                     
-                    // Xóa event listener để tránh chạy hàm này liên tục
-                    audio.removeEventListener('timeupdate', arguments.callee);
-
-                    // Thiết lập bộ đếm 100ms = 10 lần/giây
+                    // In 10 chữ LOL mỗi giây (100ms = 0.1s)
                     setInterval(() => {
                         let p = document.createElement('p');
                         p.innerText = "LOL";
                         contentDiv.appendChild(p);
+                        contentDiv.scrollTop = contentDiv.scrollHeight;
                     }, 100);
                 }
             });
