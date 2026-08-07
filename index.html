@@ -2,11 +2,10 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Hardtekk LOL System - Protected</title>
+    <title>Hardtekk LOL System - Strict</title>
     <style>
         body { background-color: #000; color: #fff; font-family: sans-serif; text-align: center; padding-top: 30px; user-select: none; }
         
-        /* Thanh tiến trình hiển thị nhạc đang chạy đến đâu */
         #progressBarContainer {
             width: 60%;
             height: 12px;
@@ -24,7 +23,6 @@
         }
 
         #timeDisplay { font-size: 16px; color: #fbc531; margin-bottom: 10px; font-weight: bold; }
-
         #content { height: 300px; overflow-y: auto; margin: 15px auto; width: 60%; border: 2px solid #ff4757; padding: 15px; background: #111; text-align: left; }
         
         .lol-line { color: #555; font-size: 16px; transition: color 0.2s ease; }
@@ -36,8 +34,8 @@
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 999;
+            background: rgba(0, 0, 0, 0.98);
+            z-index: 9999;
             padding-top: 150px;
         }
     </style>
@@ -46,7 +44,6 @@
 
     <h1 id="status">Nhấn "BẮT ĐẦU" để chạy hệ thống</h1>
     
-    <!-- Thanh tiến trình & đồng hồ thời gian -->
     <div id="timeDisplay">00:00 / 03:45</div>
     <div id="progressBarContainer">
         <div id="progressBar"></div>
@@ -63,19 +60,20 @@
     <div id="lockScreen">
         <h1 style="color: #ff4757;">BẠN ĐÃ DỪNG HỆ THỐNG!</h1>
         <h2>Vui lòng chờ phạt: <span id="countdown">60</span> giây</h2>
+        <p style="color: #888; margin-top: 20px;">(Cố tình tải lại trang hay bấm F5 cũng không thoát được án phạt đâu nhé!)</p>
     </div>
 
     <script>
-        // VÔ HIỆU HÓA CHUỘT PHẢI VÀ F12 ĐỂ CHẶN KIỂM TRA MÃ NGUỒN
+        // Chặn phím tắt F5, Ctrl+R, F12, chuột phải
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.addEventListener('keydown', event => {
             if (
+                event.key === 'F5' || 
                 event.key === 'F12' || 
-                (event.ctrlKey && event.shiftKey && (event.key === 'I' || event.key === 'J' || event.key === 'C')) || 
-                (event.ctrlKey && event.key === 'U')
+                (event.ctrlKey && (event.key === 'r' || event.key === 'R' || event.key === 'u' || event.key === 'i' || event.key === 'j' || event.key === 'c'))
             ) {
                 event.preventDefault();
-                alert('Tính năng này đã bị khóa!');
+                alert('Hành động này đã bị vô hiệu hóa!');
             }
         });
 
@@ -92,6 +90,19 @@
         let intervalId = null;
         let allLines = [];
 
+        // KIỂM TRA TRẠNG THÁI PHẠT KHI VỪA VÀO WEB HOẶC KHI VỪA BẤM RELOAD
+        window.onload = function() {
+            let punishTime = localStorage.getItem('punishEndTime');
+            if (punishTime) {
+                let remaining = Math.floor((punishTime - Date.now()) / 1000);
+                if (remaining > 0) {
+                    runPunishment(remaining);
+                } else {
+                    localStorage.removeItem('punishEndTime');
+                }
+            }
+        };
+
         function startSystem() {
             startBtn.style.display = 'none';
             stopBtn.style.display = 'inline-block';
@@ -99,7 +110,6 @@
             statusText.innerText = "Hệ thống đang chạy...";
         }
 
-        // Định dạng thời gian (giây -> mm:ss)
         function formatTime(seconds) {
             let m = Math.floor(seconds / 60);
             let s = Math.floor(seconds % 60);
@@ -107,18 +117,15 @@
         }
 
         audio.addEventListener('timeupdate', () => {
-            // Giới hạn trong khoảng 0:00 - 3:45 (225 giây) thì lặp lại
             if (audio.currentTime >= 225) {
                 audio.currentTime = 0;
                 audio.play();
             }
 
-            // Cập nhật thanh tiến trình và đồng hồ trực quan
             let percent = (audio.currentTime / 225) * 100;
             progressBar.style.width = percent + "%";
             timeDisplay.innerText = formatTime(audio.currentTime) + " / 03:45";
 
-            // Mốc 20 giây: Xả 50 LOL/s
             if (audio.currentTime >= 20 && !intervalId) {
                 statusText.innerText = "ĐANG XẢ 50 LOL/s & CHẠY HIỆU ỨNG KARAOKE!";
                 intervalId = setInterval(() => {
@@ -133,7 +140,6 @@
                 }, 100);
             }
 
-            // Hiệu ứng karaoke theo dòng chữ
             if (allLines.length > 0) {
                 let progressRatio = audio.currentTime / 225;
                 let activeIndex = Math.floor(progressRatio * allLines.length);
@@ -153,17 +159,29 @@
             audio.pause();
             clearInterval(intervalId);
             
+            // Lưu thời gian kết thúc hình phạt vào bộ nhớ trình duyệt (60 giây sau)
+            let endTime = Date.now() + 60000;
+            localStorage.setItem('punishEndTime', endTime);
+            
+            runPunishment(60);
+        }
+
+        function runPunishment(seconds) {
             lockScreen.style.display = 'block';
-            let timeLeft = 60;
+            startBtn.style.display = 'none';
+            stopBtn.style.display = 'none';
+            
+            let timeLeft = seconds;
+            countdownSpan.innerText = timeLeft;
             
             let timer = setInterval(() => {
                 timeLeft--;
                 countdownSpan.innerText = timeLeft;
                 if (timeLeft <= 0) {
                     clearInterval(timer);
+                    localStorage.removeItem('punishEndTime');
                     lockScreen.style.display = 'none';
                     startBtn.style.display = 'inline-block';
-                    stopBtn.style.display = 'none';
                     audio.currentTime = 0;
                     statusText.innerText = "Nhấn 'BẮT ĐẦU' để chạy lại hệ thống";
                 }
