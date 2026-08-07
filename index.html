@@ -2,47 +2,71 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Hardtekk LOL System</title>
+    <title>Hardtekk LOL System - Advanced</title>
     <style>
-        body { background-color: #121212; color: #ffffff; font-family: sans-serif; text-align: center; padding-top: 40px; }
-        #content { max-height: 350px; overflow-y: auto; margin: 20px auto; width: 60%; border: 1px solid #444; padding: 15px; background: #1a1a1a; text-align: left; }
-        audio { margin: 20px 0; width: 300px; }
-        #status { color: #fbc531; font-size: 18px; font-weight: bold; }
+        body { background-color: #000; color: #fff; font-family: sans-serif; text-align: center; padding-top: 50px; }
+        #content { height: 400px; overflow-y: auto; margin: 20px auto; width: 60%; border: 2px solid #ff4757; padding: 15px; background: #111; text-align: left; }
+        button { padding: 15px 30px; font-size: 18px; background-color: #ff4757; color: white; border: none; cursor: pointer; border-radius: 5px; }
     </style>
 </head>
 <body>
 
-    <h1 id="status">Hãy nhấn Play trên thanh nhạc dưới đây để bắt đầu!</h1>
+    <h1 id="status">Nhấn "BẮT ĐẦU" để chạy hệ thống</h1>
+    <audio id="bgMusic" src="https://github.com/t4037432-coder/12345LOL.ez/raw/main/ww.mp3"></audio>
     
-    <!-- Đã cập nhật link Raw chuẩn từ GitHub của bạn -->
-    <audio id="bgMusic" src="https://github.com/t4037432-coder/12345LOL.ez/raw/main/ww.mp3" controls></audio>
+    <button id="startBtn" onclick="startSystem()">BẮT ĐẦU</button>
+    <button id="stopBtn" onclick="stopSystem()" style="background-color: #57606f; display: none;">STOP</button>
     
     <div id="content"></div>
 
     <script>
-        const statusText = document.getElementById('status');
-        const contentDiv = document.getElementById('content');
         const audio = document.getElementById('bgMusic');
-        let isTriggered = false;
+        const contentDiv = document.getElementById('content');
+        const statusText = document.getElementById('status');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        let intervalId = null;
 
-        audio.addEventListener('play', () => {
-            statusText.innerText = "🎵 Nhạc đang chạy... Tự động in LOL sau mốc 20 giây!";
-        });
+        function startSystem() {
+            startBtn.style.display = 'none';
+            stopBtn.style.display = 'inline-block';
+            audio.play();
+            statusText.innerText = "Hệ thống đang chạy...";
+        }
 
+        // Tự động lặp và xử lý thời gian
         audio.addEventListener('timeupdate', () => {
-            if (audio.currentTime >= 20 && !isTriggered) {
-                isTriggered = true;
-                statusText.innerText = "🔥 Đã qua 20 giây: Hệ thống đang xả 10 LOL/s!";
-                
-                // In 10 chữ LOL mỗi giây (100ms = 0.1s / lần)
-                setInterval(() => {
-                    let p = document.createElement('p');
-                    p.innerText = "LOL";
-                    contentDiv.appendChild(p);
+            // Giới hạn trong khoảng 0:00 - 3:45 (225 giây)
+            if (audio.currentTime >= 225) {
+                audio.currentTime = 0;
+                audio.play();
+            }
+
+            // Kích hoạt in LOL sau 20 giây
+            if (audio.currentTime >= 20 && !intervalId) {
+                statusText.innerText = "ĐANG XẢ 50 LOL/s !";
+                intervalId = setInterval(() => {
+                    for(let i=0; i<5; i++) { // In 50 cái mỗi giây = 5 cái mỗi 100ms
+                        let p = document.createElement('p');
+                        p.innerText = "LOL";
+                        contentDiv.appendChild(p);
+                    }
                     contentDiv.scrollTop = contentDiv.scrollHeight;
                 }, 100);
             }
         });
+
+        function stopSystem() {
+            audio.pause();
+            clearInterval(intervalId);
+            
+            // "Đá" người dùng ra khỏi web trong 1 phút
+            document.body.innerHTML = "<h1>BẠN ĐÃ DỪNG HỆ THỐNG. HẸN GẶP LẠI SAU 60 GIÂY!</h1>";
+            
+            setTimeout(() => {
+                location.reload(); // Tải lại trang sau 1 phút
+            }, 60000);
+        }
     </script>
 </body>
 </html>
