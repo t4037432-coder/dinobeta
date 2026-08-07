@@ -2,58 +2,47 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Hardtekk LOL System - Final</title>
+    <title>Hardtekk LOL System</title>
     <style>
-        body { background-color: #121212; color: #ffffff; font-family: 'Segoe UI', sans-serif; text-align: center; padding-top: 50px; }
-        #content { max-height: 400px; overflow-y: auto; margin: 20px auto; width: 50%; border: 1px solid #444; padding: 15px; background: #1a1a1a; text-align: left; }
-        button { padding: 15px 30px; font-size: 20px; background-color: #e84118; color: white; border: none; border-radius: 8px; cursor: pointer; }
-        button:hover { background-color: #c23616; }
-        #status { color: #fbc531; margin-bottom: 20px; }
+        body { background-color: #121212; color: #ffffff; font-family: sans-serif; text-align: center; padding-top: 40px; }
+        #content { max-height: 350px; overflow-y: auto; margin: 20px auto; width: 60%; border: 1px solid #444; padding: 15px; background: #1a1a1a; text-align: left; }
+        audio { margin: 20px 0; width: 300px; }
+        #status { color: #fbc531; font-size: 18px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <h1 id="status">Nhấn "Khởi động hệ thống" để bắt đầu</h1>
+    <h1 id="status">Hãy nhấn Play trên thanh nhạc dưới đây để bắt đầu!</h1>
     
-    <!-- File nhạc mới ww.mp3 -->
-    <audio id="bgMusic" src="ww.mp3"></audio>
+    <!-- Đã cập nhật link Raw chuẩn từ GitHub của bạn -->
+    <audio id="bgMusic" src="https://github.com/t4037432-coder/12345LOL.ez/raw/main/ww.mp3" controls></audio>
     
-    <button onclick="startSystem()">Khởi động hệ thống</button>
     <div id="content"></div>
 
     <script>
         const statusText = document.getElementById('status');
         const contentDiv = document.getElementById('content');
         const audio = document.getElementById('bgMusic');
-        let hasStarted = false;
         let isTriggered = false;
 
-        function startSystem() {
-            if (hasStarted) return;
-            hasStarted = true;
-            
-            audio.play().then(() => {
-                statusText.innerText = "🎵 Nhạc đang chạy... Chờ 20 giây đầu.";
-            }).catch(e => {
-                statusText.innerText = "⚠️ Lỗi: Không thể phát ww.mp3. Kiểm tra file!";
-                hasStarted = false;
-            });
+        audio.addEventListener('play', () => {
+            statusText.innerText = "🎵 Nhạc đang chạy... Tự động in LOL sau mốc 20 giây!";
+        });
 
-            audio.addEventListener('timeupdate', function checkTime() {
-                if (audio.currentTime >= 20 && !isTriggered) {
-                    isTriggered = true;
-                    statusText.innerText = "🚀 Đã đạt 20 giây: Kích hoạt 10 LOL/s!";
-                    
-                    // In 10 chữ LOL mỗi giây (100ms/lần)
-                    setInterval(() => {
-                        let p = document.createElement('p');
-                        p.innerText = "LOL";
-                        contentDiv.appendChild(p);
-                        contentDiv.scrollTop = contentDiv.scrollHeight;
-                    }, 100);
-                }
-            });
-        }
+        audio.addEventListener('timeupdate', () => {
+            if (audio.currentTime >= 20 && !isTriggered) {
+                isTriggered = true;
+                statusText.innerText = "🔥 Đã qua 20 giây: Hệ thống đang xả 10 LOL/s!";
+                
+                // In 10 chữ LOL mỗi giây (100ms = 0.1s / lần)
+                setInterval(() => {
+                    let p = document.createElement('p');
+                    p.innerText = "LOL";
+                    contentDiv.appendChild(p);
+                    contentDiv.scrollTop = contentDiv.scrollHeight;
+                }, 100);
+            }
+        });
     </script>
 </body>
 </html>
