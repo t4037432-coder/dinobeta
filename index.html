@@ -25,12 +25,12 @@
         #timeDisplay { font-size: 16px; color: #fbc531; margin-bottom: 10px; font-weight: bold; }
         #content { height: 300px; overflow-y: auto; margin: 15px auto; width: 60%; border: 2px solid #ff4757; padding: 15px; background: #111; text-align: left; }
         
-        .lol-line { color: #555; font-size: 16px; transition: color 0.2s ease; }
-        .lol-line.active { color: #fbc531; font-size: 20px; font-weight: bold; text-shadow: 0 0 10px #fbc531; }
+        /* Chữ to, rõ nét hơn */
+        .lol-line { color: #ffffff; font-size: 20px; font-weight: bold; margin: 5px 0; }
 
         button { padding: 15px 30px; font-size: 18px; background-color: #ff4757; color: white; border: none; cursor: pointer; border-radius: 5px; font-weight: bold; }
         
-        #lockScreen {
+        #lockScreen, #warningScreen {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -60,10 +60,29 @@
     <div id="lockScreen">
         <h1 style="color: #ff4757;">BẠN ĐÃ DỪNG HỆ THỐNG!</h1>
         <h2>Vui lòng chờ phạt: <span id="countdown">60</span> giây</h2>
-        <p style="color: #888; margin-top: 20px;">(Cố tình tải lại trang hay bấm F5 cũng không thoát được án phạt đâu nhé!)</p>
+    </div>
+
+    <!-- Màn hình cảnh báo gây lag -->
+    <div id="warningScreen" style="display: block;">
+        <h1 style="color: #fbc531; font-size: 40px;">⚠️ CẢNH BÁO GÂY LAG!</h1>
+        <h2 style="color: #fff;">Trang web này sẽ tự động đóng sau <span id="warnCountdown">3</span> giây...</h2>
     </div>
 
     <script>
+        // Tự động đếm ngược 3 giây rồi đóng trang khi vừa vào web
+        let warnTime = 3;
+        const warnCountdownSpan = document.getElementById('warnCountdown');
+        const warningScreen = document.getElementById('warningScreen');
+
+        let warnTimer = setInterval(() => {
+            warnTime--;
+            warnCountdownSpan.innerText = warnTime;
+            if (warnTime <= 0) {
+                clearInterval(warnTimer);
+                warningScreen.style.display = 'none';
+            }
+        }, 1000);
+
         // Chặn phím tắt F5, Ctrl+R, F12, chuột phải
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.addEventListener('keydown', event => {
@@ -88,9 +107,7 @@
         const timeDisplay = document.getElementById('timeDisplay');
         
         let intervalId = null;
-        let allLines = [];
 
-        // KIỂM TRA TRẠNG THÁI PHẠT KHI VỪA VÀO WEB HOẶC KHI VỪA BẤM RELOAD
         window.onload = function() {
             let punishTime = localStorage.getItem('punishEndTime');
             if (punishTime) {
@@ -127,31 +144,16 @@
             timeDisplay.innerText = formatTime(audio.currentTime) + " / 03:45";
 
             if (audio.currentTime >= 20 && !intervalId) {
-                statusText.innerText = "ĐANG XẢ 50 LOL/s & CHẠY HIỆU ỨNG KARAOKE!";
+                statusText.innerText = "ĐANG XẢ 50 LOL/s!";
                 intervalId = setInterval(() => {
                     for(let i = 0; i < 5; i++) {
                         let p = document.createElement('p');
                         p.className = 'lol-line';
                         p.innerText = "LOL - Hardtekk System Running...";
                         contentDiv.appendChild(p);
-                        allLines.push(p);
                     }
                     contentDiv.scrollTop = contentDiv.scrollHeight;
                 }, 100);
-            }
-
-            if (allLines.length > 0) {
-                let progressRatio = audio.currentTime / 225;
-                let activeIndex = Math.floor(progressRatio * allLines.length);
-
-                allLines.forEach((line, index) => {
-                    if (index === activeIndex) {
-                        line.classList.add('active');
-                        line.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    } else {
-                        line.classList.remove('active');
-                    }
-                });
             }
         });
 
@@ -159,7 +161,6 @@
             audio.pause();
             clearInterval(intervalId);
             
-            // Lưu thời gian kết thúc hình phạt vào bộ nhớ trình duyệt (60 giây sau)
             let endTime = Date.now() + 60000;
             localStorage.setItem('punishEndTime', endTime);
             
